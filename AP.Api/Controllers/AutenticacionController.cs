@@ -61,7 +61,7 @@ namespace AP.Api.Controllers
         {
             var jwtKey = _configuration["Jwt:Key"];
             var jwtIssuer = _configuration["Jwt:Issuer"];
-            var jwtAudience = _configuration["Jwt:Audience"];
+            //var jwtAudience = _configuration["Jwt:Audience"];
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
@@ -75,10 +75,16 @@ namespace AP.Api.Controllers
 
             var token = new JwtSecurityToken(
                 issuer: jwtIssuer,
-                audience: jwtAudience,
+                //audience: jwtAudience,
                 claims: claims,
                 expires: DateTime.UtcNow.AddHours(1),
                 signingCredentials: credentials);
+
+            // Añadir manualmente múltiples audiencias
+            token.Payload["aud"] = new[] {
+                "https://localhost:9001",
+                "https://localhost:9002"
+            };
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
